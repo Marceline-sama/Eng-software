@@ -4,6 +4,8 @@ from typing import List
 
 import uvicorn
 
+import Jogo
+
 app = FastAPI()
 
 # Dados iniciais do jogo
@@ -17,13 +19,14 @@ dados_jogadores = {}
 
 @app.post("/escolher_cor/")
 def escolher_cor(nome_jogador: str, cor: str):
-    if cor not in cores_disponiveis:
+    jogo = Jogo()    
+    if cor not in jogo.cores_disponiveis:
         raise HTTPException(status_code=400, detail="Cor não disponível")
-    if nome_jogador in dados_jogadores:
+    if nome_jogador in jogo.dados_jogadores:
         raise HTTPException(status_code=400, detail="Jogador já existe")
 
-    dados_jogadores[nome_jogador] = {"cor": cor, "territorios": [], "cartas": []}
-    cores_disponiveis.remove(cor)
+    jogo.dados_jogadores[nome_jogador] = {"cor": cor, "territorios": [], "cartas": []}
+    jogo.cores_disponiveis.remove(cor)
     return {"mensagem": f"{nome_jogador} escolheu {cor}"}
 
 @app.post("/receber_objetivo/")
