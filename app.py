@@ -8,7 +8,7 @@ import Jogo
 
 app = FastAPI()
 
-# Dados iniciais do jogo
+
 jogadores = []
 cores_disponiveis = ["vermelho", "azul", "verde", "amarelo", "preto"]
 territorios = ["territorio1", "territorio2", "territorio3", "territorio4", "territorio5"]
