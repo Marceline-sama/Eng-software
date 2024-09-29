@@ -21,17 +21,11 @@ dados_jogadores = {}
 def escolher_cor(nome_jogador: str, cor: str):
     jogo = Jogo.get_instance()
 
-    if cor not in jogo.cores_disponiveis:
-        raise HTTPException(status_code=400, detail="Cor indisponível")
-
-    if nome_jogador not in jogo.jogadores:
-        jogo.jogadores[nome_jogador] = {"cor": cor, "territorios": [], "cartas": [], "objetivo": None, "exercitos": 0}
-    else:
-        raise HTTPException(status_code=400, detail="Jogador já escolheu uma cor")
-
-    jogo.cores_disponiveis.remove(cor)
-    return {"mensagem": f"{nome_jogador} escolheu a cor {cor}"}
-
+    try:
+        jogador = jogo.criar_jogador(nome_jogador, cor)
+        return {"mensagem": f"{jogador} foi adicionado com sucesso"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/receber_objetivo/")
 def receber_objetivo(nome_jogador: str):
@@ -40,13 +34,13 @@ def receber_objetivo(nome_jogador: str):
     if nome_jogador not in jogo.jogadores:
         raise HTTPException(status_code=400, detail="Jogador não encontrado")
 
-    if jogo.jogadores[nome_jogador]["objetivo"] is None:
-        objetivo = choice(jogo.objetivos)
-        jogo.jogadores[nome_jogador]["objetivo"] = objetivo
-        return {"objetivo": objetivo}
+    jogador = jogo.jogadores[nome_jogador]
+
+    if jogador.objetivo is None:
+        jogador.objetivo = choice(jogo.objetivos)
+        return {"objetivo": jogador.objetivo}
     else:
         raise HTTPException(status_code=400, detail="Objetivo já atribuído")
-
 
 @app.get("/definir_ordem_jogadores/")
 def definir_ordem_jogadores():
@@ -54,7 +48,6 @@ def definir_ordem_jogadores():
     jogadores_ordenados = list(jogo.jogadores.keys())
     shuffle(jogadores_ordenados)
     return {"ordem": jogadores_ordenados}
-
 
 @app.post("/distribuir_territorios/")
 def distribuir_territorios():
@@ -170,4 +163,4 @@ def verificar_objetivo(nome_jogador: str):
     return {"objetivo": objetivo, "status": "Não verificado"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

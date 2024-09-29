@@ -85,3 +85,17 @@ def test_mover_exercitos():
     with pytest.raises(HTTPException):
         jogo.mover_exercitos("Jogador1", "territorio1", "territorio2", 10)
 
+def test_singleton():
+    jogo1 = Jogo.get_instance()
+    jogo2 = Jogo.get_instance()
+    assert jogo1 is jogo2, "O padrão Singleton não está funcionando corretamente."
+
+def test_criar_jogador():
+    jogo = Jogo.get_instance()
+    jogador = jogo.criar_jogador("Jogador1", "vermelho")
+    assert jogador.nome == "Jogador1"
+    assert jogador.cor == "vermelho"
+
+    # Testar se cor já escolhida não pode ser usada
+    with pytest.raises(ValueError):
+        jogo.criar_jogador("Jogador2", "vermelho")
